@@ -30,12 +30,12 @@ const AppContextProvider = (props) => {
                 navigate('/profile')
             }
             await updateDoc(UserRef, {
-                lastSeen: Date.mow()
+                lastSeen: Date.now()
             })
             setInterval(async() => {
-                if(auth.chatUser){
+                if(chatUser){
                     await updateDoc(UserRef, {
-                        lastSeen: Date.mow()
+                        lastSeen: Date.now()
                     })
                 }
             }, 60000);
@@ -47,18 +47,22 @@ const AppContextProvider = (props) => {
     useEffect(() => {
         if(userData){
             const chatRef = doc(db,"chats",userData.id)
-            const unsub = onSnapshot(chatRef,async (res) =>{
-                const chatItems = res.data().chatsData;
-                console.log(res.data())
-                const tempData = []
-                for(const item of chatItems){
-                    const userRef = doc(db,"users",item.rId)
-                    const userSnap = await getDoc(userRef)
-                    const userData = userSnap.data();
-                    tempData.push({...item,userData})
+            const unsub = onSnapshot(chatRef, async (res) => {
+                const chatDataObj = res.data();
+                if (chatDataObj && chatDataObj.chatsData) {
+                    const chatItems = chatDataObj.chatsData;
+                    const tempData = [];
+                    for (const item of chatItems) {
+                        const userRef = doc(db, "users", item.rId);
+                        const userSnap = await getDoc(userRef);
+                        const userData = userSnap.data();
+                        tempData.push({ ...item, userData });
+                    }
+                    setChatData(tempData.sort((a, b) => b.updatedAt - a.updatedAt));
+                } else {
+                    setChatData([]);
                 }
-                setChatData(tempData.sort((a,b) => b.updatedAt - a.updatedAt))
-            })
+            });
             return () => {
                 unsub()
             }

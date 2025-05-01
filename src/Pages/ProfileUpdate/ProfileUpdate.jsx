@@ -6,7 +6,7 @@ import { auth, db } from '../../Config/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import upload from '../../Lib/Upload';
+import upload from '../../Lib/upload';
 import { AppContext } from '../../Context/AppContext';
 
 const ProfileUpdate = () => {
